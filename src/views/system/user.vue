@@ -10,14 +10,7 @@
     </el-breadcrumb>
     <!-- 搜索筛选 -->
     <el-form :inline="true" :model="formInline" class="user-search">
-      <el-form-item label="搜索：">
-        <el-select size="small" v-model="formInline.isLock" placeholder="请选择">
-          <el-option label="全部" value=""></el-option>
-          <el-option label="正常" value="N"></el-option>
-          <el-option label="已锁定" value="Y"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="">
+      <el-form-item label="搜索："></el-form-item><el-form-item label="">
         <el-input size="small" v-model="formInline.userName" placeholder="输入用户名"></el-input>
       </el-form-item>
       <el-form-item label="">
@@ -26,46 +19,32 @@
       <el-form-item>
         <el-button size="small" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
         <el-button size="small" type="primary" icon="el-icon-plus" @click="handleEdit()">添加</el-button>
-        <el-button size="small" type="primary" @click="handleunit()">部门设置</el-button>
       </el-form-item>
     </el-form>
     <!--列表-->
-    <el-table size="small" @selection-change="selectChange" :data="userData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;">
+    <el-table size="small" @selection-change="selectChange" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;">
       <el-table-column align="center" type="selection" width="50">
       </el-table-column>
-      <el-table-column align="center" sortable prop="deptName" label="公司" width="120">
+      <el-table-column align="center" sortable prop="name" label="用户名" width="120">
       </el-table-column>
-      <el-table-column align="center" sortable prop="userName" label="用户名" width="120">
+      <el-table-column align="center" sortable prop="password" label="密码" width="120">
       </el-table-column>
-      <el-table-column align="center" sortable prop="userRealName" label="姓名" width="120">
+      <el-table-column align="center" sortable prop="provinceName" label="省份" width="120">
       </el-table-column>
-      <el-table-column align="center" sortable prop="userMobile" label="手机号" width="120">
+      <el-table-column align="center" sortable prop="cityName" label="城市" width="120">
       </el-table-column>
-      <el-table-column align="center" sortable prop="userSex" label="性别" min-width="50">
+      <el-table-column align="center" sortable prop="contribute" label="贡献值" min-width="50">
       </el-table-column>
-      <el-table-column align="center" sortable prop="userEmail" label="邮件" min-width="120">
+      <el-table-column align="center" sortable prop="phoneNumber" label="电话" min-width="120">
       </el-table-column>
       <el-table-column align="center" sortable prop="editTime" label="修改时间" min-width="120">
         <template slot-scope="scope">
           <div>{{scope.row.editTime|timestampToTime}}</div>
         </template>
       </el-table-column>
-      <el-table-column align="center" sortable prop="isLock" label="状态" min-width="50">
-        <template slot-scope="scope">
-          <el-switch v-model="scope.row.isLock=='N'?nshow:fshow" active-color="#13ce66" inactive-color="#ff4949" @change="editType(scope.$index, scope.row)">
-          </el-switch>
-        </template>
+      <el-table-column align="center" sortable prop="permission" label="权限" min-width="50">
       </el-table-column>
-      <el-table-column label="操作" min-width="300">
-        <template slot-scope="scope">
-          <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="deleteUser(scope.$index, scope.row)">删除</el-button>
-          <el-button size="mini" type="success" @click="resetpwd(scope.$index, scope.row)">重置密码</el-button>
-          <el-button size="mini" type="success" @click="dataAccess(scope.$index, scope.row)">数据权限</el-button>
-          <el-button size="mini" type="success" @click="offlineUser(scope.$index, scope.row)">下线</el-button>
-          <el-button size="mini" type="success" @click="refreshCache(scope.$index, scope.row)">刷新缓存</el-button>
-        </template>
-      </el-table-column>
+      <el-table-column align="center" prop="address" label="详细地址" min-width="300"></el-table-column>
     </el-table>
     <!-- 分页组件 -->
     <Pagination v-bind:child-msg="pageparm" @callFather="callFather"></Pagination>
@@ -123,39 +102,36 @@
 
 <script>
 // 导入请求方法
-import {
-  userList,
-  userSave,
-  userDelete,
-  userPwd,
-  userExpireToken,
-  userFlashCache,
-  userLock,
-  UserDeptTree,
-  UserDeptSave,
-  UserDeptdeptTree,
-  UserChangeDept
-} from '../../api/userMG'
 import Pagination from '../../components/Pagination'
+import axios from "axios";
 export default {
   data() {
     return {
       nshow: true, //switch开启
       fshow: false, //switch关闭
-      loading: false, //是显示加载
       title: '添加用户',
       editFormVisible: false, //控制编辑页面显示与隐藏
       dataAccessshow: false, //控制数据权限显示与隐藏
       unitAccessshow: false, //控制所属单位隐藏与显示
+      listData: {
+        "name": "",
+        "password": "",
+        "provinceName": "",
+        "cityName": "",
+        "address": "",
+        "phoneNumber": "",
+        "permission": "",
+        "contribute": ""
+      },
       // 编辑与添加
       editForm: {
-        userId: '',
         userName: '',
-        userRealName: '',
-        roleId: '',
-        userMobile: '',
-        userEmail: '',
-        userSex: '',
+        userPwd: '',
+        userProvince: '',
+        userCity: '',
+        userAdr: '',
+        userTel: '',
+        userAuth: '',
         token: localStorage.getItem('logintoken')
       },
       // 部门参数
@@ -209,14 +185,13 @@ export default {
       offline: {
         token: localStorage.getItem('logintoken')
       },
+
       // 请求数据参数
       formInline: {
         page: 1,
         limit: 10,
-        deptId: '',
         userName: '',
         userMobile: '',
-        isLock: ''
       },
       //用户数据
       userData: [],
@@ -252,7 +227,7 @@ export default {
    * 创建完毕
    */
   created() {
-    this.getdata(this.formInline)
+    this.getdata()
   },
 
   /**
@@ -261,265 +236,21 @@ export default {
   methods: {
     // 获取数据方法
     getdata(parameter) {
-      this.loading = true
-      // 模拟数据开始
-      let res = {
-        code: 0,
-        msg: null,
-        count: 12,
-        data: [
-          {
-            addUser: '1',
-            editUser: '1',
-            addTime: null,
-            editTime: 1527411068000,
-            userId: 1,
-            systemNo: 'pmd',
-            userName: 'root',
-            userPassword: 'e10adc3949ba59abbe56e057f20f883e',
-            userRealName: '超级管理员',
-            userSex: '女',
-            userMobile: '138123456789',
-            userEmail: '111@qq.com',
-            isLock: 'N',
-            deptId: 1,
-            deptName: 'xxxx',
-            roleId: 1
-          },
-          {
-            addUser: '1',
-            editUser: '1',
-            addTime: null,
-            editTime: 1527410579000,
-            userId: 3,
-            systemNo: 'mc',
-            userName: 'zengzhuo',
-            userPassword: 'e10adc3949ba59abbe56e057f20f883e',
-            userRealName: '系统管理员',
-            userSex: 'M',
-            userMobile: '18616988966',
-            userEmail: '222@qq.com',
-            isLock: 'N',
-            deptId: 2,
-            deptName: 'xxxx',
-            roleId: 101
-          },
-          {
-            addUser: '1',
-            editUser: '4',
-            addTime: null,
-            editTime: 1527411586000,
-            userId: 4,
-            systemNo: 'ec',
-            userName: 'admin',
-            userPassword: '59ba8b7dda9ff79186311a5a9fa155ca',
-            userRealName: '超级管理员',
-            userSex: '女',
-            userMobile: '138123456789',
-            userEmail: 'huangxuekun@founder.com',
-            isLock: 'N',
-            deptId: 2,
-            deptName: 'xxxx',
-            roleId: 3
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1526275128000,
-            editTime: 1526284402000,
-            userId: 28,
-            systemNo: null,
-            userName: 'eee111',
-            userPassword: 'e10adc3949ba59abbe56e057f20f883e',
-            userRealName: '123111',
-            userSex: '男',
-            userMobile: '12354342345',
-            userEmail: '111232@qq.com',
-            isLock: 'N',
-            deptId: 4,
-            deptName: 'zxxxxx',
-            roleId: 1
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1526284533000,
-            editTime: 1526284533000,
-            userId: 37,
-            systemNo: null,
-            userName: 'ces',
-            userPassword: 'e10adc3949ba59abbe56e057f20f883e',
-            userRealName: 'sesfg',
-            userSex: '男',
-            userMobile: '12312312312',
-            userEmail: '122111111',
-            isLock: 'N',
-            deptId: 1,
-            deptName: 'xxxx',
-            roleId: 1
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1526285228000,
-            editTime: 1526285228000,
-            userId: 43,
-            systemNo: null,
-            userName: '22',
-            userPassword: 'e10adc3949ba59abbe56e057f20f883e',
-            userRealName: '22',
-            userSex: '男',
-            userMobile: '222',
-            userEmail: '222',
-            isLock: 'N',
-            deptId: 1,
-            deptName: 'xxxx',
-            roleId: 1
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1526448593000,
-            editTime: 1526448593000,
-            userId: 58,
-            systemNo: null,
-            userName: '1',
-            userPassword: 'e10adc3949ba59abbe56e057f20f883e',
-            userRealName: '1',
-            userSex: '女',
-            userMobile: '13607118810',
-            userEmail: '1@qq.com',
-            isLock: 'N',
-            deptId: 1,
-            deptName: 'xxxx',
-            roleId: 1
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1526452698000,
-            editTime: 1526520341000,
-            userId: 60,
-            systemNo: null,
-            userName: '222222222',
-            userPassword: 'e10adc3949ba59abbe56e057f20f883e',
-            userRealName: '222222222222',
-            userSex: '男',
-            userMobile: '13607118810',
-            userEmail: '111@qq.com',
-            isLock: 'N',
-            deptId: 1,
-            deptName: 'xxxx',
-            roleId: 1
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1526452731000,
-            editTime: 1526452731000,
-            userId: 61,
-            systemNo: null,
-            userName: '33333333333333',
-            userPassword: 'e10adc3949ba59abbe56e057f20f883e',
-            userRealName: '4444444444444444444',
-            userSex: '女',
-            userMobile: '13607118810',
-            userEmail: 'qqq@qq.com',
-            isLock: 'N',
-            deptId: 1,
-            deptName: 'xxxx',
-            roleId: 2
-          },
-          {
-            addUser: null,
-            editUser: null,
-            addTime: 1526452756000,
-            editTime: 1527128981000,
-            userId: 62,
-            systemNo: null,
-            userName: '211111111',
-            userPassword: 'e10adc3949ba59abbe56e057f20f883e',
-            userRealName: '21111111111',
-            userSex: '男',
-            userMobile: '13601478451',
-            userEmail: '222222@qq.com',
-            isLock: 'N',
-            deptId: 17,
-            deptName: 'v',
-            roleId: 2
-          }
-        ]
-      }
-      this.loading = false
-      this.userData = res.data
-      // 分页赋值
-      this.pageparm.currentPage = this.formInline.page
-      this.pageparm.pageSize = this.formInline.limit
-      this.pageparm.total = res.count
-      // 模拟数据结束
-
-      /***
-       * 调用接口，注释上面模拟数据 取消下面注释
-       */
-      // 获取用户列表
-      // userList(parameter).then(res => {
-      //   this.loading = false
-      //   if (res.success == false) {
-      //     this.$message({
-      //       type: 'info',
-      //       message: res.msg
-      //     })
-      //   } else {
-      //     this.userData = res.data
-      //     // 分页赋值
-      //     this.pageparm.currentPage = this.formInline.page
-      //     this.pageparm.pageSize = this.formInline.limit
-      //     this.pageparm.total = res.count
-      //   }
-      // })
-    },
-    // 分页插件事件
-    callFather(parm) {
-      this.formInline.page = parm.currentPage
-      this.formInline.limit = parm.pageSize
-      this.getdata(this.formInline)
-    },
-    //搜索事件
-    search() {
-      this.getdata(this.formInline)
-    },
-    // 修改type
-    editType: function(index, row) {
-      this.loading = true
-      let parm = {
-        lock: '',
-        userId: '',
-        token: localStorage.getItem('logintoken')
-      }
-      parm.userId = row.userId
-      let lock = row.isLock
-      if (lock == 'N') {
-        parm.lock = 'Y'
-      } else {
-        parm.lock = 'N'
-      }
-      // 修改状态
-      userLock(parm).then(res => {
-        this.loading = false
-        if (res.success == false) {
-          this.$message({
-            type: 'info',
-            message: res.msg
-          })
-        } else {
-          this.$message({
-            type: 'success',
-            message: '状态修改成功'
-          })
-          this.getdata(this.formInline)
-        }
+      axios.get("api/user/showAllUser").then( (response) => {
+        // this.userData = response.data;
+        // console.log(this.userData)
+        console.log(response.data)
+        this.listData = response.data
+      }, function (err) {
+        console.log(err);
       })
+      // this.loading = false
+      // // 分页赋值
+      // this.pageparm.currentPage = this.formInline.page
+      // this.pageparm.pageSize = this.formInline.limit
+      // this.pageparm.total = res.count
     },
+
     //显示编辑界面
     handleEdit: function(index, row) {
       this.editFormVisible = true
@@ -904,4 +635,3 @@ export default {
 }
 </style>
 
- 

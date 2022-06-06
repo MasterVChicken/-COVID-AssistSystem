@@ -11,7 +11,7 @@ import router from './router';
 import store from './vuex/store';
 // 引入icon
 import './assets/icon/iconfont.css'
-// 
+//
 
 // 引入echarts
 import echarts from 'echarts'
@@ -37,6 +37,7 @@ router.beforeEach((to, from, next) => {
         if (to.meta.requireAuth) { // 判断该路由是否需要登录权限
             if (Boolean(localStorage.getItem("userInfo"))) { // 通过vuex state获取当前的user是否存在
                 next();
+              // if(localStorage.getItem(""))
             } else {
                 next({
                     path: '/login',
@@ -49,7 +50,7 @@ router.beforeEach((to, from, next) => {
                     next();
                 } else {
                     /**
-                     * 防刷新，如果登录，修改路由跳转到登录页面，修改路由为登录后的首页 
+                     * 防刷新，如果登录，修改路由跳转到登录页面，修改路由为登录后的首页
                      */
                     next({
                         path: '/goods/Goods'

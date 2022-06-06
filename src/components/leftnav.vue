@@ -1,6 +1,6 @@
 /**
 * 左边菜单
-*/ 
+*/
 <template>
   <el-menu default-active="2" :collapse="collapsed" collapse-transition router :default-active="$route.path" unique-opened class="el-menu-vertical-demo" background-color="#334157" text-color="#fff" active-text-color="#ffd04b">
     <div class="logobox">
@@ -168,12 +168,30 @@ export default {
               menus: null
             }
           ]
+        },
+        // 自己添加的VirusMap导航栏
+        {
+          menuid: 180,
+          icon: 'li-icon-shangchengxitongtubiaozitihuayuanwenjian91',
+          menuname: '疫情现状',
+          hasThird: null,
+          url: null,
+          menus: [
+            {
+              menuid: 181,
+              icon: 'icon-provider-manage',
+              menuname: '全国疫情地图',
+              hasThird: 'N',
+              url: 'map/VirusMap',
+              menus: null
+            }
+          ]
         }
       ],
       msg: 'success'
     }
           this.allmenu = res.data
-    
+
     // menu(localStorage.getItem('logintoken'))
     //   .then(res => {
     //     console.log(JSON.stringify(res))

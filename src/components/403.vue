@@ -1,10 +1,10 @@
 /**
 * 404
-*/ 
+*/
 <template>
-  <div class="page-404">
+  <div class="page-403">
     <h1>404!</h1>
-    <h2>Sorry, page not found</h2>
+    <h2>对不起，您没有权限访问此页面。</h2>
   </div>
 </template>
 
@@ -17,7 +17,7 @@
   font-weight: 700;
   line-height: 150px;
   text-shadow: rgba(61, 61, 61, 0.3) 1px 1px, rgba(61, 61, 61, 0.2) 2px 2px,
-    rgba(61, 61, 61, 0.3) 3px 3px;
+  rgba(61, 61, 61, 0.3) 3px 3px;
 }
 .page-404 h2 {
   line-height: 30px;
