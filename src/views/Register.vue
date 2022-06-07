@@ -4,7 +4,7 @@
              class="demo-ruleForm login-container">
       <h3 class="title">用户注册</h3>
       <el-form-item prop="username">
-        <el-input type="text" v-model="ruleForm.username" auto-complete="off" placeholder="用户名"></el-input>
+        <el-input type="text" v-model="ruleForm.name" auto-complete="off" placeholder="用户名"></el-input>
       </el-form-item>
       <el-form-item prop="password">
         <el-input type="password" v-model="ruleForm.password" auto-complete="off" placeholder="密码"></el-input>
@@ -32,7 +32,6 @@
       <el-form-item prop="contribute">
         <el-input type="number" v-model="ruleForm.contribute" auto-complete="off" placeholder="贡献值"></el-input>
       </el-form-item>
-      <el-checkbox class="remember" v-model="rememberpwd">记住密码</el-checkbox>
       <el-form-item style="width:100%">
         <el-button type="primary" style="width:100%;" @click="goToRegister()">提交注册</el-button>
       </el-form-item>
@@ -64,7 +63,7 @@ export default {
       },
       //rules前端验证
       rules: {
-        username: [{required: true, message: '请输入账号', trigger: 'blur'}],
+        name: [{required: true, message: '请输入账号', trigger: 'blur'}],
         password: [{required: true, message: '请输入密码', trigger: 'blur'}],
         provinceName: [{required: true, message: '请输入省份名称', trigger: 'blur'}],
         cityName: [{required: true, message: '请输入城市名称', trigger: 'blur'}],
@@ -84,51 +83,9 @@ export default {
   },
 
   methods: {
-    // tologin() {
-    //   let params = new URLSearchParams()
-    //   params.append('userName', this.ruleForm.username)
-    //   params.append('password', this.ruleForm.password)
-    //   axios.post("api/index/login", params, {
-    //     headers: {
-    //       'Access-Control-Allow-Credentials': 'true', //解决session问题
-    //       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' //将表单数据传递转化为form-data类型
-    //     }
-    //   }).then((response) => {
-    //     console.log(response.data)
-    //     // 判断登陆是否成功
-    //     if (response.data == "当前用户不存在") {
-    //       alert("当前用户不存在");
-    //       setTimeout()
-    //     } else if (response.data == "密码错误") {
-    //       alert("密码错误")
-    //     } else {
-    //       alert("Bingo!登陆成功！")
-    //       // 保存密码
-    //       if (this.rememberpwd) {
-    //         //保存帐号到cookie，有效期7天
-    //         setCookie('user', this.ruleForm.username, 7)
-    //         //保存密码到cookie，有效期7天
-    //         setCookie('pwd', this.ruleForm.password, 7)
-    //       } else {
-    //         delCookie('user')
-    //         delCookie('pwd')
-    //       }
-    //
-    //       setTimeout(() => {
-    //         // 缓存用户个人信息
-    //         localStorage.setItem('userdata', JSON.stringify(response.data))
-    //         this.$store.commit('login', 'true')
-    //         this.$router.push({path: '/goods/Goods'})
-    //       }, 1000)
-    //     }
-    //   }, function (err) {
-    //     console.log(err);
-    //   })
-    // },
-
     goToRegister() {
       let params = new URLSearchParams();
-      params.append('userName', this.ruleForm.username)
+      params.append('name', this.ruleForm.name)
       params.append('password', this.ruleForm.password)
       params.append('provinceName', this.ruleForm.provinceName)
       params.append('cityName', this.ruleForm.cityName)
@@ -137,25 +94,23 @@ export default {
       params.append('permission', this.ruleForm.permission)
       params.append('contribute', this.ruleForm.contribute)
 
-      console.log(params)
-
-      // axios.post("api/user/addUser/", params, {
-      //   headers: {
-      //     'Access-Control-Allow-Credentials': 'true', //解决session问题
-      //     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' //将表单数据传递转化为form-data类型
-      //   }
-      // }).then((response) => {
-      //   alert(response.data)
-      //   if (response.data == 'fail') {
-      //     alert('用户已存在，请更换用户名')
-      //   } else if (response.data == "success") {
-      //     alert('注册成功')
-      //     setTimeout(() => {
-      //       this.$router.push({path: '/login'})
-      //     }, 1000)
-      //   }
-      // })
-      // alert("everybody high起来")
+      axios.post("api/user/addUser/", params, {
+        headers: {
+          'Access-Control-Allow-Credentials': 'true', //解决session问题
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' //将表单数据传递转化为form-data类型
+        }
+      }).then((response) => {
+        if (response.data == 'fail') {
+          alert('用户已存在，请更换用户名')
+        } else if (response.data == "success") {
+          alert('注册成功')
+          setTimeout(() => {
+            this.$router.push({path: '/login'})
+          }, 1000)
+        }
+      },function(err){
+        console.log("错误是"+err.response)
+      })
     }
   }
 }
