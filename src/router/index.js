@@ -3,6 +3,8 @@ import Vue from 'vue';
 import Router from 'vue-router';
 // 登录
 import login from '@/views/login';
+// 注册
+import Register from "@/views/Register";
 // 首页
 import index from '@/views/index';
 /**
@@ -74,6 +76,14 @@ export default new Router({
     meta: {
       requireAuth: false
     }
+  },{
+    path: '/register',
+    name: '注册',
+    component: Register,
+    hidden: true,
+    meta: {
+      requireAuth: false
+    }
   }, {
     path: '/index',
     name: '首页',
@@ -84,7 +94,7 @@ export default new Router({
       name: '商品管理',
       component: Goods,
       meta: {
-        requireAuth: true
+        requireAuth: false
       }
     }, {
       path: '/machine/Machine',
